@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from ..models.interview_chain import InterviewManager, InterviewContext
 
+
 class InterviewService:
     def __init__(self):
         self.interview_manager = InterviewManager()

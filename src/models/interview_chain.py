@@ -4,12 +4,14 @@ from langchain.chains import LLMChain
 from langchain.prompts import ChatPromptTemplate
 from langchain_anthropic import ChatAnthropic
 
+
 @dataclass
 class InterviewContext:
     resume: str
     job_description: str
     current_question: Optional[str] = None
     previous_answer: Optional[str] = None
+
 
 class InterviewChainFactory:
     @staticmethod
