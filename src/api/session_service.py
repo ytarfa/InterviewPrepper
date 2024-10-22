@@ -2,22 +2,12 @@ import uuid
 from tinydb import TinyDB
 from tinydb.storages import JSONStorage
 from tinydb.middlewares import CachingMiddleware
-from dataclasses import dataclass
 from abc import ABC
+
+from ..types.session import Session
 
 
 db = TinyDB('../session-db.json', storage=CachingMiddleware(JSONStorage))
-
-
-@dataclass
-class Session:
-    session_id: str
-    resume: str = None
-    job_description: str = None
-    resume_skills: list = None
-    job_description_skills: list = None
-    yoe: int = None
-    messages: list = None
 
 
 class SessionService(ABC):
