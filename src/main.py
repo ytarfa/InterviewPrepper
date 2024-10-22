@@ -20,18 +20,13 @@ class AnswerSubmission(BaseModel):
     generate_followup: bool = False
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/sessions")
+@app.get("/api/sessions")
 async def get_all_sessions():
     session_service = TinyDBSessionService()
     return session_service.get_all_sessions()
 
 
-@app.post("/sessions")
+@app.post("/api/sessions")
 async def create_session():
     session_service = TinyDBSessionService()
     return session_service.create_session()
