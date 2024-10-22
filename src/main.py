@@ -32,6 +32,12 @@ async def create_session():
     return session_service.create_session()
 
 
+@app.get("/api/sessions/{session_id}")
+async def get_session(session_id: str):
+    session_service = TinyDBSessionService()
+    return session_service.get_session(session_id)
+
+
 @app.post("/api/interview/start")
 async def start_interview(data: InterviewStart):
     return interview_service.start_interview(
