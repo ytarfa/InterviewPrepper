@@ -6,6 +6,8 @@ from .message import Message
 
 class SessionStage(str, Enum):
     START = "start"
+    RESUME = "resume"
+    JOB_DESCRIPTION = "job_description"
 
 
 @dataclass
