@@ -1,4 +1,3 @@
-# api/routes.py
 from typing import Optional
 
 from fastapi import APIRouter, Request
@@ -6,6 +5,7 @@ from pydantic import BaseModel
 
 from ..core.interview.interview_manager import InterviewManager
 from ..core.session.tiny_db_session_service import TinyDBSessionService
+from ..domain.models.message import Message
 
 sessions_router = APIRouter(prefix="/api/sessions")
 
@@ -46,6 +46,6 @@ class HandleMessageData(BaseModel):
 
 
 @sessions_router.post("/message")
-async def handle_message(data: HandleMessageData):
+async def handle_message(data: HandleMessageData) -> Message:
     interview_manager = InterviewManager(session_service=TinyDBSessionService(), session_id=data.session_id)
-    await interview_manager.handle_message(data.message)
+    return await interview_manager.handle_message(data.message)
