@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 from enum import Enum
 
+from pydantic import BaseModel
 
-class MessageType(Enum):
+
+class MessageType(str, Enum):
     USER = "user"
     SYSTEM = "system"
 
 
-@dataclass
-class Message:
-    message: str
-    type: str
+class Message(BaseModel):
+    content: str
+    type: MessageType
