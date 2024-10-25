@@ -1,6 +1,10 @@
 # api/routes.py
-from fastapi import APIRouter
+from typing import Optional
 
+from fastapi import APIRouter, Request
+from pydantic import BaseModel
+
+from ..core.interview.interview_manager import InterviewManager
 from ..core.session.tiny_db_session_service import TinyDBSessionService
 
 sessions_router = APIRouter(prefix="/api/sessions")
@@ -25,7 +29,7 @@ async def delete_all_sessions():
 
 
 @sessions_router.get("/{session_id}")
-async def get_session(session_id: str):
+def get_session(session_id: str):
     session_service = TinyDBSessionService()
     return session_service.get_session(session_id)
 
@@ -34,3 +38,14 @@ async def get_session(session_id: str):
 async def delete_session(session_id: str):
     session_service = TinyDBSessionService()
     return session_service.delete_session(session_id)
+
+
+class HandleMessageData(BaseModel):
+    session_id: str
+    message: Optional[str] = None
+
+
+@sessions_router.post("/message")
+async def handle_message(data: HandleMessageData):
+    interview_manager = InterviewManager(session_service=TinyDBSessionService(), session_id=data.session_id)
+    await interview_manager.handle_message(data.message)
