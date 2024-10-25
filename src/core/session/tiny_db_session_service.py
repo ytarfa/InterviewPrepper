@@ -1,11 +1,12 @@
 import uuid
 from tinydb import Query
 
+from .session_service import SessionService
 from ...infrastructure.tiny_db import db
 from ...domain.models.session import Session
 
 
-class TinyDBSessionService:
+class TinyDBSessionService(SessionService):
 
     @staticmethod
     def get_all_sessions() -> list[Session]:
@@ -35,9 +36,3 @@ class TinyDBSessionService:
         Session = Query()
         for session in sessions:
             db.remove(Session.session_id == session["session_id"])
-
-    @staticmethod
-    def add_messages(session_id: str, messages: list[str]) -> Session:
-        session: Session = db.get(doc_id=session_id)
-        session.messages.append(messages)
-        return session
