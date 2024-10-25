@@ -36,6 +36,7 @@ async def get_session(session_id: str):
     session_service = TinyDBSessionService()
     return session_service.get_session(session_id)
 
+
 @app.delete("/api/sessions/{session_id}")
 async def delete_session(session_id: str):
     session_service = TinyDBSessionService()

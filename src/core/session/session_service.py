@@ -2,6 +2,7 @@ from abc import ABC
 
 from ...domain.models.session import Session
 
+
 class SessionService(ABC):
     def get_all_sessions(self) -> list[Session]:
         pass
