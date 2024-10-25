@@ -1,21 +1,27 @@
+import abc
 from abc import ABC
 
+from ...domain.models.message import Message
 from ...domain.models.session import Session
 
 
 class SessionService(ABC):
     @staticmethod
-    async def get_all_sessions() -> list[Session]:
+    @abc.abstractmethod
+    def get_all_sessions() -> list[Session]:
         pass
 
     @staticmethod
-    async def create_session() -> Session:
+    @abc.abstractmethod
+    def create_session() -> Session:
         pass
 
     @staticmethod
-    async def get_session(session_id: str) -> Session:
+    @abc.abstractmethod
+    def get_session(session_id: str) -> Session:
         pass
 
     @staticmethod
-    async def add_messages(session_id: str, messages: list[str]) -> Session:
+    @abc.abstractmethod
+    def add_messages(session_id: str, messages: list[Message]) -> Session:
         pass
