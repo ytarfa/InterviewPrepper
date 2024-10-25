@@ -16,23 +16,30 @@ class TinyDBSessionService(SessionService):
     def create_session() -> Session:
         session_id = str(uuid.uuid4())
         session = Session(session_id=session_id)
-        session.messages = []
-        db.insert(session.__dict__)
+        session.messages = [
+            Message(
+                content=start_message,
+                type=MessageType.SYSTEM
+            )
+        ]
+        db.insert(session.model_dump())
         return session
 
     @staticmethod
     def get_session(session_id: str) -> Session:
-        Session = Query()
-        return db.get(Session.session_id == session_id)
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            return Session(**session_document)
 
     @staticmethod
     def delete_session(session_id: str) -> None:
-        Session = Query()
-        db.remove(Session.session_id == session_id)
+        session_query = Query()
+        db.remove(session_query.session_id == session_id)
 
     @staticmethod
     def delete_all_sessions() -> None:
         sessions = db.all()
-        Session = Query()
-        for session in sessions:
-            db.remove(Session.session_id == session["session_id"])
+        session_query = Query()
+        for session_doc in sessions:
+            db.remove(session_query.session_id == session_doc["session_id"])
