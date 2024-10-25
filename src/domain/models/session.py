@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel
 
 from .message import Message
 
@@ -10,13 +13,12 @@ class SessionStage(str, Enum):
     JOB_DESCRIPTION = "job_description"
 
 
-@dataclass
-class Session:
+class Session(BaseModel):
     session_id: str
-    resume: str = None
-    job_description: str = None
-    resume_skills: list = None
-    job_description_skills: list = None
-    yoe: int = None
-    messages: list[Message] = None
+    resume: Optional[str] = None
+    job_description: Optional[str] = None
+    resume_skills: Optional[list] = None
+    job_description_skills: Optional[list] = None
+    yoe: Optional[int] = None
+    messages: Optional[list[Message]] = None
     stage: SessionStage = SessionStage.START
