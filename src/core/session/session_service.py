@@ -4,7 +4,7 @@ from tinydb.storages import JSONStorage
 from tinydb.middlewares import CachingMiddleware
 from abc import ABC
 
-from ..types.session import Session
+from ...domain.models.session import Session
 
 
 db = TinyDB('../session-db.json')

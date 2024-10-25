@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from .api.inverview_service import InterviewService
-from .api.session_service import TinyDBSessionService
+from .core.session.session_service import TinyDBSessionService
+
 
 app = FastAPI()
-interview_service = InterviewService()
 
 
 class InterviewStart(BaseModel):
@@ -47,22 +46,3 @@ async def delete_session(session_id: str):
 async def delete_all_sessions():
     session_service = TinyDBSessionService()
     return session_service.delete_all_sessions()
-
-
-@app.post("/api/interview/start")
-async def start_interview(data: InterviewStart):
-    return interview_service.start_interview(
-        data.resume,
-        data.job_description
-    )
-
-
-@app.post("/api/interview/answer")
-async def handle_answer(data: AnswerSubmission):
-    return interview_service.handle_answer(
-        data.resume,
-        data.job_description,
-        data.current_question,
-        data.answer,
-        data.generate_followup
-    )
