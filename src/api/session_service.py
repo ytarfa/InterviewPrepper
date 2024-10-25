@@ -1,5 +1,5 @@
 import uuid
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
 from tinydb.middlewares import CachingMiddleware
 from abc import ABC
@@ -7,7 +7,7 @@ from abc import ABC
 from ..types.session import Session
 
 
-db = TinyDB('../session-db.json', storage=CachingMiddleware(JSONStorage))
+db = TinyDB('../session-db.json')
 
 
 class SessionService(ABC):
@@ -34,12 +34,14 @@ class TinyDBSessionService:
     def create_session() -> Session:
         session_id = str(uuid.uuid4())
         session = Session(session_id=session_id)
+        session.messages = []
         db.insert(session.__dict__)
         return session
 
     @staticmethod
     def get_session(session_id: str) -> Session:
-        return db.get(doc_id=session_id)
+        Session = Query()
+        return db.get(Session.session_id == session_id)
 
     @staticmethod
     def add_messages(session_id: str, messages: list[str]) -> Session:
