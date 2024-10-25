@@ -44,6 +44,17 @@ class TinyDBSessionService:
         return db.get(Session.session_id == session_id)
 
     @staticmethod
+    def delete_session(session_id: str) -> None:
+        Session = Query()
+        db.remove(Session.session_id == session_id)
+
+    @staticmethod
+    def delete_all_sessions() -> None:
+        sessions = db.all()
+        Session = Query()
+        for session in sessions:
+            db.remove(Session.session_id == session["session_id"])
+    @staticmethod
     def add_messages(session_id: str, messages: list[str]) -> Session:
         session: Session = db.get(doc_id=session_id)
         session.messages.append(messages)
