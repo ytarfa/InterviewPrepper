@@ -2,6 +2,8 @@ import uuid
 from tinydb import Query
 
 from .session_service import SessionService
+from ..prompts.interview.introduction import start_message
+from ...domain.models.message import Message, MessageType
 from ...infrastructure.tiny_db import db
 from ...domain.models.session import Session
 
@@ -43,3 +45,13 @@ class TinyDBSessionService(SessionService):
         session_query = Query()
         for session_doc in sessions:
             db.remove(session_query.session_id == session_doc["session_id"])
+
+    @staticmethod
+    def add_messages(session_id: str, messages: list[Message]) -> Session:
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            session = Session(**session_document)
+            session.messages.extend(messages)
+            db.update(session.model_dump(), session_query.session_id == session_id)
+            return session
