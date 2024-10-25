@@ -4,14 +4,18 @@ from ...domain.models.session import Session
 
 
 class SessionService(ABC):
-    def get_all_sessions(self) -> list[Session]:
+    @staticmethod
+    async def get_all_sessions() -> list[Session]:
         pass
 
-    def create_session(self) -> Session:
+    @staticmethod
+    async def create_session() -> Session:
         pass
 
-    def get_session(self, session_id: str) -> Session:
+    @staticmethod
+    async def get_session(session_id: str) -> Session:
         pass
 
-    def add_messages(self, session_id: str, messages: list[str]) -> Session:
+    @staticmethod
+    async def add_messages(session_id: str, messages: list[str]) -> Session:
         pass
