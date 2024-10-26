@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .message import Message
 
 
-class SessionStage(str, Enum):
+class SessionState(str, Enum):
     START = "start"
     RESUME = "resume"
     JOB_DESCRIPTION = "job_description"
@@ -21,4 +21,4 @@ class Session(BaseModel):
     job_description_skills: Optional[list] = None
     yoe: Optional[int] = None
     messages: Optional[list[Message]] = None
-    stage: SessionStage = SessionStage.START
+    state: SessionState = SessionState.START

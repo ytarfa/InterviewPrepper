@@ -6,12 +6,12 @@ from .resume_state import InterviewManagerResumeState
 from ..session.session_service import SessionService
 from .start_state import InterviewManagerStartState
 from ...domain.models.message import Message, MessageType
-from ...domain.models.session import SessionStage
+from ...domain.models.session import SessionState
 
-step_map: dict[SessionStage, Callable[..., InterviewManagerState]] = {
-    SessionStage.START: InterviewManagerStartState,
-    SessionStage.RESUME: InterviewManagerResumeState,
-    SessionStage.JOB_DESCRIPTION: InterviewManagerJobDescriptionState
+step_map: dict[SessionState, Callable[..., InterviewManagerState]] = {
+    SessionState.START: InterviewManagerStartState,
+    SessionState.RESUME: InterviewManagerResumeState,
+    SessionState.JOB_DESCRIPTION: InterviewManagerJobDescriptionState
 }
 
 
@@ -24,10 +24,11 @@ class InterviewManager:
 
     async def initialize(self):
         session = self.session_service.get_session(self.session_id)
-        state = step_map[session.stage](change_state=self.change_state, session=session)
+        state = step_map[session.state](change_state=self.change_state, session=session)
         self.change_state(state)
 
     def change_state(self, state: InterviewManagerState):
+        self.session_service.change_state(self.session_id, state.get_session_state())
         self.state = state
 
     async def handle_message(self, message: str) -> Message:
