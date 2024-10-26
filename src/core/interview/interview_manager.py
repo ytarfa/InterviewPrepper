@@ -1,52 +1,34 @@
 from collections.abc import Callable
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi.params import Depends
 
-from .interview_manager_states.interview_state import InterviewState
-from .interview_manager_states.job_description_state import JobDescriptionState
-from .interview_manager_states.job_description_validation_state import (
-    JobDescriptionValidationState,
-)
-from .interview_manager_states.resume_state import ResumeState
-from .interview_manager_states.resume_validation_state import ResumeValidationState
-from .interview_manager_states.start_state import StartState
-from .interview_manager_states.state_base import InterviewManagerStateInterface
+from .interview_manager_states.strategy_base import InterviewManagerStrategyInterface
+from .interview_manager_states.strategy_factory import StrategyFactory
 from ..session.session_service import SessionService
 from ..session.tiny_db_session_service import TinyDBSessionService
 from ...domain.models.message import Message, MessageType
-from ...domain.models.session import SessionState
-
-step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
-    SessionState.START: StartState,
-    SessionState.RESUME: ResumeState,
-    SessionState.JOB_DESCRIPTION: JobDescriptionState,
-    SessionState.RESUME_VALIDATION: ResumeValidationState,
-    SessionState.JOB_DESCRIPTION_VALIDATION: JobDescriptionValidationState,
-    SessionState.INTERVIEW: InterviewState,
-}
 
 
 class InterviewManager:
     def __init__(
         self,
         session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
+        strategy_factory: Annotated[StrategyFactory, Depends(StrategyFactory)],
     ):
         self.session_service = session_service
+        self.strategy_factory = strategy_factory
         self.ready = False
         self.session_id = None
-        self.state = None
+        self.strategy: Optional[InterviewManagerStrategyInterface] = None
 
     async def initialize(self, session_id: str):
         self.session_id = session_id
         session = self.session_service.get_session(session_id)
-        state = step_map[session.state](change_state=self.change_state, session=session)
-        self.change_state(state)
+        self.strategy = self.strategy_factory.create_strategy(
+            session_id=self.session_id, session_state=session.state
+        )
         self.ready = True
-
-    def change_state(self, state: InterviewManagerStateInterface):
-        self.session_service.change_state(self.session_id, state.get_session_state())
-        self.state = state
 
     async def handle_message(self, message: str) -> Message:
         if not self.ready:
@@ -58,9 +40,15 @@ class InterviewManager:
             messages=[Message(content=message, type=MessageType.USER)],
         )
         # Handle message
-        response = await self.state.handle_message(message=message)
+        target_state = await self.strategy.handle_message(message=message)
+        # Set session state as target state
+        self.session_service.update_state(
+            session_id=self.session_id, state=target_state.get_session_state()
+        )
         # Write response to session messages
+        response = target_state.get_init_message()
         self.session_service.add_messages(
             session_id=self.session_id, messages=[response]
         )
+
         return response

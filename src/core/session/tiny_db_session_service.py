@@ -82,3 +82,13 @@ class TinyDBSessionService(SessionService):
             session.job_description_info = job_description_info
             db.update(session.model_dump(), session_query.session_id == session_id)
             return session
+
+    @staticmethod
+    def update_state(session_id: str, state: SessionState):
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            session = Session(**session_document)
+            session.state = state
+            db.update(session.model_dump(), session_query.session_id == session_id)
+            return session
