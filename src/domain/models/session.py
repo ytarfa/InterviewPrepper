@@ -5,8 +5,9 @@ from typing import Optional
 from pydantic import BaseModel
 
 from .job_description_info import JobDescriptionInfo
-from .message import Message
+from .message import Message, MessageType
 from .resume_info import ResumeInfo
+from ...core.prompts.interview.introduction import start_message
 
 
 class SessionState(str, Enum):
@@ -22,5 +23,8 @@ class Session(BaseModel):
     session_id: str
     resume_info: Optional[ResumeInfo] = None
     job_description_info: Optional[JobDescriptionInfo] = None
-    messages: Optional[list[Message]] = None
+    messages: list[Message] = [Message(
+        content=start_message,
+        type=MessageType.SYSTEM
+    )]
     state: SessionState = SessionState.START

@@ -2,9 +2,8 @@ import uuid
 from tinydb import Query
 
 from .session_service import SessionService
-from ..prompts.interview.introduction import start_message
 from ...domain.models.job_description_info import JobDescriptionInfo
-from ...domain.models.message import Message, MessageType
+from ...domain.models.message import Message
 from ...domain.models.resume_info import ResumeInfo
 from ...infrastructure.tiny_db import db
 from ...domain.models.session import Session, SessionState
@@ -20,12 +19,6 @@ class TinyDBSessionService(SessionService):
     def create_session() -> Session:
         session_id = str(uuid.uuid4())
         session = Session(session_id=session_id)
-        session.messages = [
-            Message(
-                content=start_message,
-                type=MessageType.SYSTEM
-            )
-        ]
         db.insert(session.model_dump())
         return session
 
