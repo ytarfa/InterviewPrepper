@@ -3,6 +3,7 @@ from tinydb import Query
 
 from .session_service import SessionService
 from ..prompts.interview.introduction import start_message
+from ...domain.models.job_description_info import JobDescriptionInfo
 from ...domain.models.message import Message, MessageType
 from ...domain.models.resume_info import ResumeInfo
 from ...infrastructure.tiny_db import db
@@ -74,5 +75,15 @@ class TinyDBSessionService(SessionService):
         if session_document:
             session = Session(**session_document)
             session.resume_info = resume_info
+            db.update(session.model_dump(), session_query.session_id == session_id)
+            return session
+
+    @staticmethod
+    def update_job_description_info(session_id: str, job_description_info: JobDescriptionInfo):
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            session = Session(**session_document)
+            session.job_description_info = job_description_info
             db.update(session.model_dump(), session_query.session_id == session_id)
             return session

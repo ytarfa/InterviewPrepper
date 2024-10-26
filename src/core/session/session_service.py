@@ -1,6 +1,7 @@
 import abc
 from abc import ABC
 
+from ...domain.models.job_description_info import JobDescriptionInfo
 from ...domain.models.message import Message
 from ...domain.models.resume_info import ResumeInfo
 from ...domain.models.session import Session, SessionState
@@ -35,4 +36,9 @@ class SessionService(ABC):
     @staticmethod
     @abc.abstractmethod
     def update_resume_info(session_id: str, resume_info: ResumeInfo):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def update_job_description_info(session_id: str, job_description_info: JobDescriptionInfo):
         pass
