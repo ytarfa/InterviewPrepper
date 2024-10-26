@@ -1,7 +1,8 @@
 from typing import Optional
 
-from src.core.interview.interview_manager_state import InterviewManagerStateInterface, InterviewManagerStateBase
-from src.core.interview.job_description_state import InterviewManagerJobDescriptionState
+from src.core.interview.interview_manager_states.job_description_state import InterviewManagerJobDescriptionState
+from src.core.interview.interview_manager_states.state_base import InterviewManagerStateInterface, \
+    InterviewManagerStateBase
 from src.domain.models.message import Message, MessageType
 from src.domain.models.session import SessionState
 

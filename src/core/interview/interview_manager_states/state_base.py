@@ -4,8 +4,8 @@ from collections.abc import Callable
 from typing import Optional
 from typing_extensions import Self
 
-from ...domain.models.message import Message
-from ...domain.models.session import Session, SessionState
+from src.domain.models.message import Message
+from src.domain.models.session import Session, SessionState
 
 
 class InterviewManagerStateBase:

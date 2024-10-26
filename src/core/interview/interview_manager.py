@@ -1,12 +1,13 @@
 from collections.abc import Callable
 
-from .interview_manager_state import InterviewManagerStateInterface
-from .job_description_state import InterviewManagerJobDescriptionState
-from .job_description_validation_state import InterviewManagerJobDescriptionValidationState
-from .resume_state import InterviewManagerResumeState
-from .resume_validation_state import InterviewManagerResumeValidationState
+from .interview_manager_states.interview_state import InterviewManagerInterviewState
+from .interview_manager_states.job_description_state import InterviewManagerJobDescriptionState
+from .interview_manager_states.job_description_validation_state import InterviewManagerJobDescriptionValidationState
+from .interview_manager_states.resume_state import InterviewManagerResumeState
+from .interview_manager_states.resume_validation_state import InterviewManagerResumeValidationState
+from .interview_manager_states.start_state import InterviewManagerStartState
+from .interview_manager_states.state_base import InterviewManagerStateInterface
 from ..session.session_service import SessionService
-from .start_state import InterviewManagerStartState
 from ...domain.models.message import Message, MessageType
 from ...domain.models.session import SessionState
 

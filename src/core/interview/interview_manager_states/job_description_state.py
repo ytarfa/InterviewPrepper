@@ -3,8 +3,8 @@ from typing import Optional
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 
-from src.core.interview.interview_manager_state import InterviewManagerStateInterface, InterviewManagerStateBase
-from src.core.interview.job_description_validation_state import InterviewManagerJobDescriptionValidationState
+from src.core.interview.interview_manager_states.state_base import InterviewManagerStateInterface, \
+    InterviewManagerStateBase
 from src.core.prompts.interview.extract_job_description_info import extract_job_description_info_prompt_template
 from src.core.prompts.interview.introduction import get_job_description_message
 from src.core.session.tiny_db_session_service import TinyDBSessionService
