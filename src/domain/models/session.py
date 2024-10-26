@@ -10,7 +10,9 @@ from .message import Message
 class SessionState(str, Enum):
     START = "start"
     RESUME = "resume"
+    RESUME_VALIDATION = "resume_validation"
     JOB_DESCRIPTION = "job_description"
+    JOB_DESCRIPTION_VALIDATION = "job_description_validation"
 
 
 class Session(BaseModel):
