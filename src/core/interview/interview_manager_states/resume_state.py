@@ -4,7 +4,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from src.core.interview.interview_manager_states.state_base import InterviewManagerStateInterface, InterviewManagerStateBase
-from src.core.interview.interview_manager_states.resume_validation_state import InterviewManagerResumeValidationState
+from src.core.interview.interview_manager_states.resume_validation_state import ResumeValidationState
 from src.core.prompts.interview.extract_resume_info import extract_resume_info_prompt_template
 from src.core.prompts.interview.introduction import get_resume_message
 from src.core.session.tiny_db_session_service import TinyDBSessionService
@@ -14,7 +14,7 @@ from src.domain.models.session import SessionState
 from src.infrastructure.llm import claude_sonnet
 
 
-class InterviewManagerResumeState(InterviewManagerStateInterface, InterviewManagerStateBase):
+class ResumeState(InterviewManagerStateInterface, InterviewManagerStateBase):
     def __init__(self, change_state, session):
         super().__init__(change_state=change_state, session=session)
 
@@ -49,7 +49,7 @@ class InterviewManagerResumeState(InterviewManagerStateInterface, InterviewManag
         session_service.update_resume_info(session_id=self.session.session_id, resume_info=resume_info)
 
 
-        target_state = InterviewManagerResumeValidationState(session=self.session, change_state=self.change_state)
+        target_state = ResumeValidationState(session=self.session, change_state=self.change_state)
         self.change_state(target_state)
 
         return target_state.get_init_message()

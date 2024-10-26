@@ -4,8 +4,8 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from src.core.interview.interview_manager_states.state_base import InterviewManagerStateInterface, InterviewManagerStateBase
-from src.core.interview.interview_manager_states.job_description_state import InterviewManagerJobDescriptionState
-from src.core.interview.interview_manager_states.resume_state import InterviewManagerResumeState
+from src.core.interview.interview_manager_states.job_description_state import JobDescriptionState
+from src.core.interview.interview_manager_states.resume_state import ResumeState
 from src.core.prompts.interview.introduction import start_message_intent_classifier_prompt, \
     StartMessageClassifierPromptOutput
 from src.domain.models.message import Message
@@ -14,13 +14,13 @@ from src.infrastructure.llm import claude_haiku
 
 
 change_state_map: dict[StartMessageClassifierPromptOutput, Callable[..., InterviewManagerStateInterface]] = {
-    StartMessageClassifierPromptOutput.RESUME: InterviewManagerResumeState,
-    StartMessageClassifierPromptOutput.JOB_DESCRIPTION: InterviewManagerJobDescriptionState,
+    StartMessageClassifierPromptOutput.RESUME: ResumeState,
+    StartMessageClassifierPromptOutput.JOB_DESCRIPTION: JobDescriptionState,
     # TODO: Create state for 'other'
-    StartMessageClassifierPromptOutput.OTHER: InterviewManagerResumeState,
+    StartMessageClassifierPromptOutput.OTHER: ResumeState,
 }
 
-class InterviewManagerStartState(InterviewManagerStateInterface, InterviewManagerStateBase):
+class StartState(InterviewManagerStateInterface, InterviewManagerStateBase):
     def __init__(self, change_state, session):
         super().__init__(change_state=change_state, session=session)
 

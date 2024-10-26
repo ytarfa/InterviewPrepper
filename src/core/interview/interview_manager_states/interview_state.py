@@ -6,7 +6,7 @@ from src.domain.models.message import Message, MessageType
 from src.domain.models.session import SessionState
 
 
-class InterviewManagerInterviewState(InterviewManagerStateInterface, InterviewManagerStateBase):
+class InterviewState(InterviewManagerStateInterface, InterviewManagerStateBase):
     def __init__(self, change_state, session):
         super().__init__(change_state=change_state, session=session)
 

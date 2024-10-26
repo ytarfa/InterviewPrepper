@@ -1,23 +1,23 @@
 from collections.abc import Callable
 
-from .interview_manager_states.interview_state import InterviewManagerInterviewState
-from .interview_manager_states.job_description_state import InterviewManagerJobDescriptionState
-from .interview_manager_states.job_description_validation_state import InterviewManagerJobDescriptionValidationState
-from .interview_manager_states.resume_state import InterviewManagerResumeState
-from .interview_manager_states.resume_validation_state import InterviewManagerResumeValidationState
-from .interview_manager_states.start_state import InterviewManagerStartState
+from .interview_manager_states.interview_state import InterviewState
+from .interview_manager_states.job_description_state import JobDescriptionState
+from .interview_manager_states.job_description_validation_state import JobDescriptionValidationState
+from .interview_manager_states.resume_state import ResumeState
+from .interview_manager_states.resume_validation_state import ResumeValidationState
+from .interview_manager_states.start_state import StartState
 from .interview_manager_states.state_base import InterviewManagerStateInterface
 from ..session.session_service import SessionService
 from ...domain.models.message import Message, MessageType
 from ...domain.models.session import SessionState
 
 step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
-    SessionState.START: InterviewManagerStartState,
-    SessionState.RESUME: InterviewManagerResumeState,
-    SessionState.JOB_DESCRIPTION: InterviewManagerJobDescriptionState,
-    SessionState.RESUME_VALIDATION: InterviewManagerResumeValidationState,
-    SessionState.JOB_DESCRIPTION_VALIDATION: InterviewManagerJobDescriptionValidationState,
-    SessionState.INTERVIEW: InterviewManagerInterviewState
+    SessionState.START: StartState,
+    SessionState.RESUME: ResumeState,
+    SessionState.JOB_DESCRIPTION: JobDescriptionState,
+    SessionState.RESUME_VALIDATION: ResumeValidationState,
+    SessionState.JOB_DESCRIPTION_VALIDATION: JobDescriptionValidationState,
+    SessionState.INTERVIEW: InterviewState
 }
 
 
