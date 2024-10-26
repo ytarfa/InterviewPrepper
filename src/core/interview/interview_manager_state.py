@@ -5,7 +5,7 @@ from typing import Optional
 from typing_extensions import Self
 
 from ...domain.models.message import Message
-from ...domain.models.session import Session
+from ...domain.models.session import Session, SessionState
 
 
 class InterviewManagerState(ABC):
@@ -20,4 +20,9 @@ class InterviewManagerState(ABC):
     @staticmethod
     @abc.abstractmethod
     def get_init_message() -> Optional[Message]:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_session_state() -> SessionState:
         pass

@@ -5,7 +5,7 @@ from .session_service import SessionService
 from ..prompts.interview.introduction import start_message
 from ...domain.models.message import Message, MessageType
 from ...infrastructure.tiny_db import db
-from ...domain.models.session import Session
+from ...domain.models.session import Session, SessionState
 
 
 class TinyDBSessionService(SessionService):
@@ -53,5 +53,15 @@ class TinyDBSessionService(SessionService):
         if session_document:
             session = Session(**session_document)
             session.messages.extend(messages)
+            db.update(session.model_dump(), session_query.session_id == session_id)
+            return session
+
+    @staticmethod
+    def change_state(session_id: str, state: SessionState):
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            session = Session(**session_document)
+            session.state = state
             db.update(session.model_dump(), session_query.session_id == session_id)
             return session

@@ -1,4 +1,3 @@
-import os
 from typing import Optional, Callable
 
 from langchain_core.output_parsers import StrOutputParser
@@ -10,6 +9,7 @@ from .resume_state import InterviewManagerResumeState
 from ..prompts.interview.introduction import start_message_intent_classifier_prompt, \
     StartMessageClassifierPromptOutput
 from ...domain.models.message import Message
+from ...domain.models.session import SessionState
 from ...infrastructure.llm import claude_haiku
 
 
@@ -25,8 +25,13 @@ class InterviewManagerStartState(InterviewManagerState):
         self.__change_state = change_state
         self.session = session
 
-    def get_init_message(self) -> Optional[Message]:
+    @staticmethod
+    def get_init_message() -> Optional[Message]:
         return None
+
+    @staticmethod
+    def get_session_state() -> SessionState:
+        return SessionState.JOB_DESCRIPTION
 
     async def handle_message(self, message: Optional[str]) -> Message:
         chain = (PromptTemplate.from_template(start_message_intent_classifier_prompt)

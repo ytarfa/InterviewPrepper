@@ -2,7 +2,7 @@ import abc
 from abc import ABC
 
 from ...domain.models.message import Message
-from ...domain.models.session import Session
+from ...domain.models.session import Session, SessionState
 
 
 class SessionService(ABC):
@@ -24,4 +24,9 @@ class SessionService(ABC):
     @staticmethod
     @abc.abstractmethod
     def add_messages(session_id: str, messages: list[Message]) -> Session:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def change_state(session_id: str, state: SessionState):
         pass
