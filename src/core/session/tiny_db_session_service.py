@@ -4,6 +4,7 @@ from tinydb import Query
 from .session_service import SessionService
 from ..prompts.interview.introduction import start_message
 from ...domain.models.message import Message, MessageType
+from ...domain.models.resume_info import ResumeInfo
 from ...infrastructure.tiny_db import db
 from ...domain.models.session import Session, SessionState
 
@@ -63,5 +64,15 @@ class TinyDBSessionService(SessionService):
         if session_document:
             session = Session(**session_document)
             session.state = state
+            db.update(session.model_dump(), session_query.session_id == session_id)
+            return session
+
+    @staticmethod
+    def update_resume_info(session_id: str, resume_info: ResumeInfo):
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            session = Session(**session_document)
+            session.resume_info = resume_info
             db.update(session.model_dump(), session_query.session_id == session_id)
             return session

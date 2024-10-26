@@ -7,6 +7,7 @@ from src.core.interview.interview_manager_state import InterviewManagerStateInte
 from src.core.interview.resume_validation_state import InterviewManagerResumeValidationState
 from src.core.prompts.interview.extract_resume_info import extract_resume_info_prompt_template
 from src.core.prompts.interview.introduction import get_resume_message
+from src.core.session.tiny_db_session_service import TinyDBSessionService
 from src.domain.models.message import Message, MessageType
 from src.domain.models.resume_info import ResumeInfo
 from src.domain.models.session import SessionState
@@ -28,7 +29,7 @@ class InterviewManagerResumeState(InterviewManagerStateInterface, InterviewManag
     def get_session_state() -> SessionState:
         return SessionState.RESUME
 
-    async def handle_message(self, message: Optional[str]):
+    async def handle_message(self, message: Optional[str]) -> Message:
         parser = PydanticOutputParser(pydantic_object=ResumeInfo)
         format_instructions = parser.get_format_instructions()
         extract_resume_info_chain = ((PromptTemplate(
@@ -41,10 +42,14 @@ class InterviewManagerResumeState(InterviewManagerStateInterface, InterviewManag
         resume_info: ResumeInfo = extract_resume_info_chain.invoke({
             "resume_text": message
         })
-        # TODO: resume info should be saved to session
-        print(resume_info.years_of_experience)
 
-        target_state = InterviewManagerResumeValidationState(session = self.session, change_state=self.change_state)
+        # Save resume info to session
+        # TODO: decouple state and TinyDBSessionService
+        session_service = TinyDBSessionService()
+        session_service.update_resume_info(session_id=self.session.session_id, resume_info=resume_info)
+
+
+        target_state = InterviewManagerResumeValidationState(session=self.session, change_state=self.change_state)
         self.change_state(target_state)
 
         return target_state.get_init_message()

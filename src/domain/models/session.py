@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from .message import Message
+from .resume_info import ResumeInfo
 
 
 class SessionState(str, Enum):
@@ -17,10 +18,6 @@ class SessionState(str, Enum):
 
 class Session(BaseModel):
     session_id: str
-    resume: Optional[str] = None
-    job_description: Optional[str] = None
-    resume_skills: Optional[list] = None
-    job_description_skills: Optional[list] = None
-    yoe: Optional[int] = None
+    resume_info: Optional[ResumeInfo] = None
     messages: Optional[list[Message]] = None
     state: SessionState = SessionState.START
