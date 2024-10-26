@@ -44,3 +44,13 @@ class SessionService(ABC):
         session_id: str, job_description_info: JobDescriptionInfo
     ):
         pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def delete_all_sessions():
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def delete_session(session_id: str):
+        pass
