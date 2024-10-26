@@ -1,4 +1,7 @@
 from collections.abc import Callable
+from typing import Annotated
+
+from fastapi.params import Depends
 
 from .interview_manager_states.interview_state import InterviewState
 from .interview_manager_states.job_description_state import JobDescriptionState
@@ -10,6 +13,7 @@ from .interview_manager_states.resume_validation_state import ResumeValidationSt
 from .interview_manager_states.start_state import StartState
 from .interview_manager_states.state_base import InterviewManagerStateInterface
 from ..session.session_service import SessionService
+from ..session.tiny_db_session_service import TinyDBSessionService
 from ...domain.models.message import Message, MessageType
 from ...domain.models.session import SessionState
 
@@ -24,16 +28,21 @@ step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
 
 
 class InterviewManager:
-    def __init__(self, session_id: str, session_service: SessionService):
-        self.ready = False
-        self.session_id = session_id
+    def __init__(
+        self,
+        session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
+    ):
         self.session_service = session_service
+        self.ready = False
+        self.session_id = None
         self.state = None
 
-    async def initialize(self):
-        session = self.session_service.get_session(self.session_id)
+    async def initialize(self, session_id: str):
+        self.session_id = session_id
+        session = self.session_service.get_session(session_id)
         state = step_map[session.state](change_state=self.change_state, session=session)
         self.change_state(state)
+        self.ready = True
 
     def change_state(self, state: InterviewManagerStateInterface):
         self.session_service.change_state(self.session_id, state.get_session_state())
@@ -41,7 +50,7 @@ class InterviewManager:
 
     async def handle_message(self, message: str) -> Message:
         if not self.ready:
-            await self.initialize()
+            raise Exception("Interview Manager was not initialized correctly.")
 
         # Write user message to session messages
         self.session_service.add_messages(
