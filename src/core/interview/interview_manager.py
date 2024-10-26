@@ -15,7 +15,8 @@ step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
     SessionState.RESUME: InterviewManagerResumeState,
     SessionState.JOB_DESCRIPTION: InterviewManagerJobDescriptionState,
     SessionState.RESUME_VALIDATION: InterviewManagerResumeValidationState,
-    SessionState.JOB_DESCRIPTION_VALIDATION: InterviewManagerJobDescriptionValidationState
+    SessionState.JOB_DESCRIPTION_VALIDATION: InterviewManagerJobDescriptionValidationState,
+    SessionState.INTERVIEW: InterviewManagerInterviewState
 }
 
 
