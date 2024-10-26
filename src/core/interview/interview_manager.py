@@ -1,10 +1,11 @@
-from collections.abc import Callable
 from typing import Annotated, Optional
 
 from fastapi.params import Depends
 
-from .interview_manager_states.strategy_base import InterviewManagerStrategyInterface
-from .interview_manager_states.strategy_factory import StrategyFactory
+from src.core.interview.strategy.strategy_base import (
+    InterviewManagerStrategyInterface,
+)
+from .strategy.strategy_factory import StrategyFactory
 from ..session.session_service import SessionService
 from ..session.tiny_db_session_service import TinyDBSessionService
 from ...domain.models.message import Message, MessageType
@@ -30,7 +31,7 @@ class InterviewManager:
         )
         self.ready = True
 
-    async def handle_message(self, message: str) -> Message:
+    async def handle_message(self, message: str):
         if not self.ready:
             raise Exception("Interview Manager was not initialized correctly.")
 
@@ -39,16 +40,7 @@ class InterviewManager:
             session_id=self.session_id,
             messages=[Message(content=message, type=MessageType.USER)],
         )
-        # Handle message
-        target_state = await self.strategy.handle_message(message=message)
-        # Set session state as target state
-        self.session_service.update_state(
-            session_id=self.session_id, state=target_state.get_session_state()
-        )
-        # Write response to session messages
-        response = target_state.get_init_message()
-        self.session_service.add_messages(
-            session_id=self.session_id, messages=[response]
-        )
 
-        return response
+        strategy_commands = await self.strategy.handle_message(message=message)
+        for command in strategy_commands:
+            command.execute()

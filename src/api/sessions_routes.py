@@ -5,6 +5,7 @@ from fastapi.params import Depends
 from pydantic import BaseModel
 
 from ..core.interview.interview_manager import InterviewManager
+from ..core.interview.interview_message_context import InterviewMessageContext
 from ..core.session.session_service import SessionService
 from ..core.session.tiny_db_session_service import TinyDBSessionService
 from ..domain.models.message import Message
@@ -58,6 +59,13 @@ class HandleMessageData(BaseModel):
 async def handle_message(
     data: HandleMessageData,
     interview_manager: Annotated[InterviewManager, Depends(InterviewManager)],
-) -> Message:
+    interview_message_context: Annotated[
+        InterviewMessageContext, Depends(InterviewMessageContext)
+    ],
+    session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
+) -> list[Message]:
     await interview_manager.initialize(data.session_id)
-    return await interview_manager.handle_message(data.message)
+    await interview_manager.handle_message(data.message)
+    messages = interview_message_context.get_messages()
+    session_service.add_messages(session_id=data.session_id, messages=messages)
+    return messages
