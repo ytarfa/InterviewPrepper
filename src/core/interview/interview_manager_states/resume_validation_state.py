@@ -1,8 +1,12 @@
 from typing import Optional
 
-from src.core.interview.interview_manager_states.job_description_state import JobDescriptionState
-from src.core.interview.interview_manager_states.state_base import InterviewManagerStateInterface, \
-    InterviewManagerStateBase
+from src.core.interview.interview_manager_states.job_description_state import (
+    JobDescriptionState,
+)
+from src.core.interview.interview_manager_states.state_base import (
+    InterviewManagerStateInterface,
+    InterviewManagerStateBase,
+)
 from src.domain.models.message import Message, MessageType
 from src.domain.models.session import SessionState
 
@@ -15,8 +19,7 @@ class ResumeValidationState(InterviewManagerStateInterface, InterviewManagerStat
     def get_init_message() -> Optional[Message]:
         # TODO: Resume validation message
         return Message(
-            content="Resume validation feature is coming soon",
-            type=MessageType.SYSTEM
+            content="Resume validation feature is coming soon", type=MessageType.SYSTEM
         )
 
     @staticmethod
@@ -26,7 +29,9 @@ class ResumeValidationState(InterviewManagerStateInterface, InterviewManagerStat
     async def handle_message(self, message: Optional[str]) -> Message:
         # TODO: Resume validation
 
-        target_state = JobDescriptionState(session=self.session, change_state=self.change_state)
+        target_state = JobDescriptionState(
+            session=self.session, change_state=self.change_state
+        )
         self.change_state(target_state)
 
         return target_state.get_init_message()

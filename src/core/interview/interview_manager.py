@@ -2,7 +2,9 @@ from collections.abc import Callable
 
 from .interview_manager_states.interview_state import InterviewState
 from .interview_manager_states.job_description_state import JobDescriptionState
-from .interview_manager_states.job_description_validation_state import JobDescriptionValidationState
+from .interview_manager_states.job_description_validation_state import (
+    JobDescriptionValidationState,
+)
 from .interview_manager_states.resume_state import ResumeState
 from .interview_manager_states.resume_validation_state import ResumeValidationState
 from .interview_manager_states.start_state import StartState
@@ -17,7 +19,7 @@ step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
     SessionState.JOB_DESCRIPTION: JobDescriptionState,
     SessionState.RESUME_VALIDATION: ResumeValidationState,
     SessionState.JOB_DESCRIPTION_VALIDATION: JobDescriptionValidationState,
-    SessionState.INTERVIEW: InterviewState
+    SessionState.INTERVIEW: InterviewState,
 }
 
 
@@ -42,14 +44,14 @@ class InterviewManager:
             await self.initialize()
 
         # Write user message to session messages
-        self.session_service.add_messages(session_id=self.session_id, messages=[
-            Message(
-                content=message,
-                type=MessageType.USER
-            )
-        ])
+        self.session_service.add_messages(
+            session_id=self.session_id,
+            messages=[Message(content=message, type=MessageType.USER)],
+        )
         # Handle message
         response = await self.state.handle_message(message=message)
         # Write response to session messages
-        self.session_service.add_messages(session_id=self.session_id, messages=[response])
+        self.session_service.add_messages(
+            session_id=self.session_id, messages=[response]
+        )
         return response

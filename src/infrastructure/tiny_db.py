@@ -1,4 +1,4 @@
 from tinydb import TinyDB
 
 
-db = TinyDB('../session-db.json')
+db = TinyDB("../session-db.json")

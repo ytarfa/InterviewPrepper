@@ -23,8 +23,5 @@ class Session(BaseModel):
     session_id: str
     resume_info: Optional[ResumeInfo] = None
     job_description_info: Optional[JobDescriptionInfo] = None
-    messages: list[Message] = [Message(
-        content=start_message,
-        type=MessageType.SYSTEM
-    )]
+    messages: list[Message] = [Message(content=start_message, type=MessageType.SYSTEM)]
     state: SessionState = SessionState.START

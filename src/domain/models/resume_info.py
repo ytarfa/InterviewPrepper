@@ -16,7 +16,15 @@ class WorkExperience(BaseModel):
 
 
 class ResumeInfo(BaseModel):
-    years_of_experience: int = Field(description="Total years of professional experience as a number"),
-    skills: list[str] = Field(description="List of professional skills and technologies"),
-    work_experience: list[WorkExperience] = Field(description="List of work experiences, each containing start_date, end_date, company, and description")
-    education: list[Education] = Field(description="List of educational experiences, each containing start_date, end_date, degree, and description")
+    years_of_experience: int = (
+        Field(description="Total years of professional experience as a number"),
+    )
+    skills: list[str] = (
+        Field(description="List of professional skills and technologies"),
+    )
+    work_experience: list[WorkExperience] = Field(
+        description="List of work experiences, each containing start_date, end_date, company, and description"
+    )
+    education: list[Education] = Field(
+        description="List of educational experiences, each containing start_date, end_date, degree, and description"
+    )

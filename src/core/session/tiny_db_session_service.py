@@ -72,7 +72,9 @@ class TinyDBSessionService(SessionService):
             return session
 
     @staticmethod
-    def update_job_description_info(session_id: str, job_description_info: JobDescriptionInfo):
+    def update_job_description_info(
+        session_id: str, job_description_info: JobDescriptionInfo
+    ):
         session_query = Query()
         session_document = db.get(session_query.session_id == session_id)
         if session_document:

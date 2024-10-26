@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from ..core.interview.interview_manager import InterviewManager
@@ -47,5 +47,7 @@ class HandleMessageData(BaseModel):
 
 @sessions_router.post("/message")
 async def handle_message(data: HandleMessageData) -> Message:
-    interview_manager = InterviewManager(session_service=TinyDBSessionService(), session_id=data.session_id)
+    interview_manager = InterviewManager(
+        session_service=TinyDBSessionService(), session_id=data.session_id
+    )
     return await interview_manager.handle_message(data.message)

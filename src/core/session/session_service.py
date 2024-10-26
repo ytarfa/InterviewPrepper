@@ -40,5 +40,7 @@ class SessionService(ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def update_job_description_info(session_id: str, job_description_info: JobDescriptionInfo):
+    def update_job_description_info(
+        session_id: str, job_description_info: JobDescriptionInfo
+    ):
         pass

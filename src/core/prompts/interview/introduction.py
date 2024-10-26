@@ -16,10 +16,12 @@ start_message_intent_classifier_prompt = """
     Classification:
 """
 
+
 class StartMessageClassifierPromptOutput(Enum):
     RESUME = "resume"
     JOB_DESCRIPTION = "job_description"
     OTHER = "other"
+
 
 get_resume_message = """
     Please paste your resume in the chat.

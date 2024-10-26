@@ -1,7 +1,9 @@
 from typing import Optional
 
-from src.core.interview.interview_manager_states.state_base import InterviewManagerStateInterface, \
-    InterviewManagerStateBase
+from src.core.interview.interview_manager_states.state_base import (
+    InterviewManagerStateInterface,
+    InterviewManagerStateBase,
+)
 from src.domain.models.message import Message, MessageType
 from src.domain.models.session import SessionState
 
@@ -12,10 +14,7 @@ class InterviewState(InterviewManagerStateInterface, InterviewManagerStateBase):
 
     @staticmethod
     def get_init_message() -> Optional[Message]:
-        return Message(
-            content="",
-            type=MessageType.SYSTEM
-        )
+        return Message(content="", type=MessageType.SYSTEM)
 
     @staticmethod
     def get_session_state() -> SessionState:
