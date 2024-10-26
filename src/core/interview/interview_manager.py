@@ -2,7 +2,9 @@ from collections.abc import Callable
 
 from .interview_manager_state import InterviewManagerStateInterface
 from .job_description_state import InterviewManagerJobDescriptionState
+from .job_description_validation_state import InterviewManagerJobDescriptionValidationState
 from .resume_state import InterviewManagerResumeState
+from .resume_validation_state import InterviewManagerResumeValidationState
 from ..session.session_service import SessionService
 from .start_state import InterviewManagerStartState
 from ...domain.models.message import Message, MessageType
@@ -11,7 +13,9 @@ from ...domain.models.session import SessionState
 step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
     SessionState.START: InterviewManagerStartState,
     SessionState.RESUME: InterviewManagerResumeState,
-    SessionState.JOB_DESCRIPTION: InterviewManagerJobDescriptionState
+    SessionState.JOB_DESCRIPTION: InterviewManagerJobDescriptionState,
+    SessionState.RESUME_VALIDATION: InterviewManagerResumeValidationState,
+    SessionState.JOB_DESCRIPTION_VALIDATION: InterviewManagerJobDescriptionValidationState
 }
 
 
