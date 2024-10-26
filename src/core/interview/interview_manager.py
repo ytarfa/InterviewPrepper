@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-from .interview_manager_state import InterviewManagerState
+from .interview_manager_state import InterviewManagerStateInterface
 from .job_description_state import InterviewManagerJobDescriptionState
 from .resume_state import InterviewManagerResumeState
 from ..session.session_service import SessionService
@@ -8,7 +8,7 @@ from .start_state import InterviewManagerStartState
 from ...domain.models.message import Message, MessageType
 from ...domain.models.session import SessionState
 
-step_map: dict[SessionState, Callable[..., InterviewManagerState]] = {
+step_map: dict[SessionState, Callable[..., InterviewManagerStateInterface]] = {
     SessionState.START: InterviewManagerStartState,
     SessionState.RESUME: InterviewManagerResumeState,
     SessionState.JOB_DESCRIPTION: InterviewManagerJobDescriptionState
@@ -27,7 +27,7 @@ class InterviewManager:
         state = step_map[session.state](change_state=self.change_state, session=session)
         self.change_state(state)
 
-    def change_state(self, state: InterviewManagerState):
+    def change_state(self, state: InterviewManagerStateInterface):
         self.session_service.change_state(self.session_id, state.get_session_state())
         self.state = state
 

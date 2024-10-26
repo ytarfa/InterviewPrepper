@@ -8,11 +8,13 @@ from ...domain.models.message import Message
 from ...domain.models.session import Session, SessionState
 
 
-class InterviewManagerState(ABC):
+class InterviewManagerStateBase:
     def __init__(self, change_state: Callable[Self, None], session: Session):
-        self.__change_state = change_state
+        self.change_state = change_state
         self.session = session
 
+
+class InterviewManagerStateInterface(ABC):
     @abc.abstractmethod
     async def handle_message(self, message: Optional[str]) -> Message:
         pass
