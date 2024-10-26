@@ -48,14 +48,6 @@ class StartStrategy(InterviewManagerStrategyInterface):
             interview_message_context=interview_message_context,
         )
 
-    @staticmethod
-    def get_init_message() -> Optional[Message]:
-        return None
-
-    @staticmethod
-    def get_session_state() -> SessionState:
-        return SessionState.JOB_DESCRIPTION
-
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         chain = (
             PromptTemplate.from_template(start_message_intent_classifier_prompt)

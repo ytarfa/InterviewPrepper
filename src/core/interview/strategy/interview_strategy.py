@@ -29,14 +29,6 @@ class InterviewStrategy(InterviewManagerStrategyInterface):
             interview_message_context=interview_message_context,
         )
 
-    @staticmethod
-    def get_init_message() -> Optional[Message]:
-        return Message(content="", type=MessageType.SYSTEM)
-
-    @staticmethod
-    def get_session_state() -> SessionState:
-        return SessionState.INTERVIEW
-
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         parser = PydanticOutputParser(pydantic_object=InterviewQuestion)
         format_instructions = parser.get_format_instructions()

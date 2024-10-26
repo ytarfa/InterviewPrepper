@@ -25,13 +25,3 @@ class InterviewManagerStrategyInterface(ABC):
     @abc.abstractmethod
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         pass
-
-    @staticmethod
-    @abc.abstractmethod
-    def get_init_message() -> Optional[Message]:
-        pass
-
-    @staticmethod
-    @abc.abstractmethod
-    def get_session_state() -> SessionState:
-        pass
