@@ -15,13 +15,7 @@ from src.core.interview.command.update_session_state_command import (
 from src.core.interview.strategy.strategy_base import (
     InterviewManagerStrategyInterface,
 )
-from src.core.interview.strategy.job_description_strategy import (
-    JobDescriptionStrategy,
-)
-from src.core.interview.strategy.resume_strategy import (
-    ResumeStrategy,
-)
-from src.core.prompts.interview.introduction import (
+from src.core.prompts.interview.intent_classifiers import (
     start_message_intent_classifier_prompt,
     StartMessageClassifierPromptOutput,
 )

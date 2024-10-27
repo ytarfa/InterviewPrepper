@@ -8,7 +8,7 @@ from .interview_question import InterviewQuestion
 from .job_description_info import JobDescriptionInfo
 from .message import Message, MessageType
 from .resume_info import ResumeInfo
-from ...core.prompts.interview.introduction import start_message
+from ...core.messages.start import start_message
 
 
 class SessionState(str, Enum):
@@ -30,5 +30,6 @@ class Session(BaseModel):
     resume_info: Optional[ResumeInfo] = None
     job_description_info: Optional[JobDescriptionInfo] = None
     context: SessionContext = SessionContext()
+    # TODO: Move the init message to a strategy?
     messages: list[Message] = [Message(content=start_message, type=MessageType.SYSTEM)]
     state: SessionState = SessionState.START

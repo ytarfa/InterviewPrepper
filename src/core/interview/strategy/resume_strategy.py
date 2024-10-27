@@ -21,7 +21,6 @@ from src.core.interview.strategy.strategy_base import (
 from src.core.prompts.interview.extract_resume_info import (
     extract_resume_info_prompt_template,
 )
-from src.core.prompts.interview.introduction import get_resume_message
 from src.domain.models.message import Message, MessageType
 from src.domain.models.resume_info import ResumeInfo
 from src.domain.models.session import SessionState
