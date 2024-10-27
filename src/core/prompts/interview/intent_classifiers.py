@@ -10,10 +10,12 @@ start_message_intent_classifier_prompt = """
     <message>
     
     Classification:
+    
+    {format_instructions}
 """
 
 
-class StartMessageClassifierPromptOutput(Enum):
+class StartMessageIntentClassifierPromptOutput(Enum):
     RESUME = "resume"
     JOB_DESCRIPTION = "job_description"
     OTHER = "other"
