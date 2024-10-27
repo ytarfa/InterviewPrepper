@@ -18,6 +18,7 @@ from src.core.interview.command.update_session_state_command import (
 from src.core.interview.strategy.strategy_base import (
     InterviewManagerStrategyInterface,
 )
+from src.core.messages.ask_for_job_description import ask_for_job_description_message
 from src.core.prompts.interview.extract_resume_info import (
     extract_resume_info_prompt_template,
 )
@@ -59,16 +60,39 @@ class ResumeStrategy(InterviewManagerStrategyInterface):
             type=MessageType.SYSTEM,
         )
 
+        # If job_description_info is None, ask for job_description, else go to interview questions
+        go_to_job_description_commands = [
+            UpdateSessionStateCommand(
+                session_service=self.session_service,
+                session_id=self.session.session_id,
+                target_state=SessionState.JOB_DESCRIPTION,
+            ),
+            RespondWithMessagesCommand(
+                message=Message(
+                    content=ask_for_job_description_message, type=MessageType.SYSTEM
+                ),
+                interview_message_context=self.interview_message_context,
+            ),
+        ]
+        go_to_interview_commands = [
+            UpdateSessionStateCommand(
+                session_service=self.session_service,
+                session_id=self.session.session_id,
+                target_state=SessionState.INTERVIEW,
+            ),
+            # To-do call interview strategy instantly
+        ]
+        next_step_commands = (
+            go_to_job_description_commands
+            if self.session.resume_info is None
+            else go_to_interview_commands
+        )
+
         return [
             UpdateSessionResumeInfoCommand(
                 session_service=self.session_service,
                 session_id=self.session.session_id,
                 resume_info=resume_info,
-            ),
-            UpdateSessionStateCommand(
-                session_service=self.session_service,
-                session_id=self.session.session_id,
-                target_state=SessionState.JOB_DESCRIPTION,
             ),
             RespondWithMessagesCommand(
                 message=Message(
@@ -81,4 +105,5 @@ class ResumeStrategy(InterviewManagerStrategyInterface):
                 message=resume_info_message,
                 interview_message_context=self.interview_message_context,
             ),
+            *next_step_commands,
         ]

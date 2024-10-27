@@ -16,7 +16,6 @@ class SessionState(str, Enum):
     RESUME = "resume"
     RESUME_VALIDATION = "resume_validation"
     JOB_DESCRIPTION = "job_description"
-    JOB_DESCRIPTION_VALIDATION = "job_description_validation"
     INTERVIEW = "interview"
     EVALUATION = "evaluation"
 

@@ -2,6 +2,7 @@ from typing import Optional
 
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
+from requests import session
 
 from src.core.interview.command.command_base import (
     InterviewCommand,
@@ -18,6 +19,7 @@ from src.core.interview.command.update_session_state_command import (
 from src.core.interview.strategy.strategy_base import (
     InterviewManagerStrategyInterface,
 )
+from src.core.messages.ask_for_resume import ask_for_resume_message
 from src.core.prompts.interview.extract_job_description_info import (
     extract_job_description_info_prompt_template,
 )
@@ -57,16 +59,39 @@ class JobDescriptionStrategy(InterviewManagerStrategyInterface):
             content=job_description_info.model_dump_json(), type=MessageType.SYSTEM
         )
 
+        # If resume_info is None, ask for resume, else go to interview questions
+        go_to_resume_commands = [
+            UpdateSessionStateCommand(
+                session_service=self.session_service,
+                session_id=self.session.session_id,
+                target_state=SessionState.RESUME,
+            ),
+            RespondWithMessagesCommand(
+                message=Message(
+                    content=ask_for_resume_message, type=MessageType.SYSTEM
+                ),
+                interview_message_context=self.interview_message_context,
+            ),
+        ]
+        go_to_interview_commands = [
+            UpdateSessionStateCommand(
+                session_service=self.session_service,
+                session_id=self.session.session_id,
+                target_state=SessionState.INTERVIEW,
+            ),
+            # To-do call interview strategy instantly
+        ]
+        next_step_commands = (
+            go_to_resume_commands
+            if self.session.resume_info is None
+            else go_to_interview_commands
+        )
+
         return [
             UpdateSessionJobDescriptionInfoCommand(
                 session_service=self.session_service,
                 session_id=self.session.session_id,
                 job_description_info=job_description_info,
-            ),
-            UpdateSessionStateCommand(
-                session_service=self.session_service,
-                session_id=self.session.session_id,
-                target_state=SessionState.INTERVIEW,
             ),
             RespondWithMessagesCommand(
                 message=Message(
@@ -79,4 +104,5 @@ class JobDescriptionStrategy(InterviewManagerStrategyInterface):
                 message=job_description_info_message,
                 interview_message_context=self.interview_message_context,
             ),
+            *next_step_commands,
         ]
