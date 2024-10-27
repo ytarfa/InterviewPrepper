@@ -21,7 +21,6 @@ from src.core.interview.strategy.strategy_base import (
 from src.core.prompts.interview.extract_job_description_info import (
     extract_job_description_info_prompt_template,
 )
-from src.core.prompts.interview.introduction import get_job_description_message
 from src.domain.models.job_description_info import JobDescriptionInfo
 from src.domain.models.message import Message, MessageType
 from src.domain.models.session import SessionState
@@ -55,7 +54,7 @@ class JobDescriptionStrategy(InterviewManagerStrategyInterface):
             {"job_description_text": message}
         )
         job_description_info_message = Message(
-            content=job_description_info, type=MessageType.SYSTEM
+            content=job_description_info.model_dump_json(), type=MessageType.SYSTEM
         )
 
         return [

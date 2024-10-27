@@ -30,13 +30,11 @@ from src.domain.models.session import SessionState
 from src.infrastructure.llm import claude_haiku
 
 
-target_state_map: dict[
-    StartMessageClassifierPromptOutput, type[InterviewManagerStrategyInterface]
-] = {
-    StartMessageClassifierPromptOutput.RESUME: ResumeStrategy,
-    StartMessageClassifierPromptOutput.JOB_DESCRIPTION: JobDescriptionStrategy,
+target_state_map: dict[StartMessageClassifierPromptOutput, SessionState] = {
+    StartMessageClassifierPromptOutput.RESUME: SessionState.RESUME,
+    StartMessageClassifierPromptOutput.JOB_DESCRIPTION: SessionState.JOB_DESCRIPTION,
     # TODO: Create state for 'other'
-    StartMessageClassifierPromptOutput.OTHER: ResumeStrategy,
+    StartMessageClassifierPromptOutput.OTHER: SessionState.RESUME,
 }
 
 
@@ -67,6 +65,6 @@ class StartStrategy(InterviewManagerStrategyInterface):
                 session_service=self.session_service,
                 target_state=target_state_map[
                     StartMessageClassifierPromptOutput(response)
-                ].get_session_state(),
+                ],
             ),
         ]
