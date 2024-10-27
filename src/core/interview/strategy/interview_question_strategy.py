@@ -27,7 +27,7 @@ from src.domain.models.session import SessionState
 from src.infrastructure.llm import claude_sonnet
 
 
-class InterviewStrategy(InterviewManagerStrategyInterface):
+class InterviewQuestionStrategy(InterviewManagerStrategyInterface):
     def __init__(self, session, session_service, interview_message_context):
         super().__init__(
             session=session,

@@ -5,8 +5,8 @@ from fastapi.params import Depends
 from src.core.interview.strategy.answer_evaluation_strategy import (
     AnswerEvaluationStrategy,
 )
-from src.core.interview.strategy.interview_strategy import (
-    InterviewStrategy,
+from src.core.interview.strategy.interview_question_strategy import (
+    InterviewQuestionStrategy,
 )
 from src.core.interview.strategy.job_description_strategy import (
     JobDescriptionStrategy,
@@ -32,7 +32,7 @@ step_map: dict[
     SessionState.START: StartStrategy,
     SessionState.RESUME: ResumeStrategy,
     SessionState.JOB_DESCRIPTION: JobDescriptionStrategy,
-    SessionState.INTERVIEW: InterviewStrategy,
+    SessionState.INTERVIEW: InterviewQuestionStrategy,
     SessionState.EVALUATION: AnswerEvaluationStrategy,
 }
 
