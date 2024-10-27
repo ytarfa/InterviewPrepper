@@ -9,6 +9,12 @@ from src.core.interview.command.command_base import (
 from src.core.interview.command.respond_with_messages_command import (
     RespondWithMessagesCommand,
 )
+from src.core.interview.command.update_session_context_interview_question_command import (
+    UpdateSessionContextInterviewQuestionCommand,
+)
+from src.core.interview.command.update_session_state_command import (
+    UpdateSessionStateCommand,
+)
 from src.core.interview.strategy.strategy_base import (
     InterviewManagerStrategyInterface,
 )
@@ -16,7 +22,7 @@ from src.core.prompts.interview.generate_interview_question import (
     generate_interview_question_prompt,
 )
 from src.domain.models.interview_question import InterviewQuestion
-from src.domain.models.message import Message, MessageType
+from src.domain.models.message import Message, MessageType, InterviewQuestionMessage
 from src.domain.models.session import SessionState
 from src.infrastructure.llm import claude_sonnet
 
@@ -50,13 +56,25 @@ class InterviewStrategy(InterviewManagerStrategyInterface):
                 "job_description": self.session.job_description_info,
             }
         )
-        interview_question_message = Message(
-            content=interview_question.model_dump_json(), type=MessageType.SYSTEM
+        interview_question_message = InterviewQuestionMessage(
+            content=interview_question.model_dump_json(),
+            type=MessageType.SYSTEM,
+            interview_question=interview_question,
         )
 
         return [
+            UpdateSessionContextInterviewQuestionCommand(
+                session_id=self.session.session_id,
+                session_service=self.session_service,
+                interview_question=interview_question,
+            ),
             RespondWithMessagesCommand(
                 message=interview_question_message,
                 interview_message_context=self.interview_message_context,
-            )
+            ),
+            UpdateSessionStateCommand(
+                session_id=self.session.session_id,
+                session_service=self.session_service,
+                target_state=SessionState.EVALUATION,
+            ),
         ]

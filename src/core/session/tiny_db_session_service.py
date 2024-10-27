@@ -2,6 +2,7 @@ import uuid
 from tinydb import Query
 
 from .session_service import SessionService
+from ...domain.models.interview_question import InterviewQuestion
 from ...domain.models.job_description_info import JobDescriptionInfo
 from ...domain.models.message import Message
 from ...domain.models.resume_info import ResumeInfo
@@ -90,5 +91,17 @@ class TinyDBSessionService(SessionService):
         if session_document:
             session = Session(**session_document)
             session.state = state
+            db.update(session.model_dump(), session_query.session_id == session_id)
+            return session
+
+    @staticmethod
+    def update_context_interview_question(
+        session_id: str, interview_question: InterviewQuestion
+    ):
+        session_query = Query()
+        session_document = db.get(session_query.session_id == session_id)
+        if session_document:
+            session = Session(**session_document)
+            session.context.current_interview_question = interview_question
             db.update(session.model_dump(), session_query.session_id == session_id)
             return session

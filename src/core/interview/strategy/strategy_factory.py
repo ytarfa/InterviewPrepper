@@ -2,6 +2,9 @@ from typing import Annotated, Union
 
 from fastapi.params import Depends
 
+from src.core.interview.strategy.answer_evaluation_strategy import (
+    AnswerEvaluationStrategy,
+)
 from src.core.interview.strategy.interview_strategy import (
     InterviewStrategy,
 )
@@ -30,6 +33,7 @@ step_map: dict[
     SessionState.RESUME: ResumeStrategy,
     SessionState.JOB_DESCRIPTION: JobDescriptionStrategy,
     SessionState.INTERVIEW: InterviewStrategy,
+    SessionState.EVALUATION: AnswerEvaluationStrategy,
 }
 
 
