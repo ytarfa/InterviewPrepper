@@ -25,7 +25,7 @@ from src.core.session.session_service import SessionService
 from src.core.session.tiny_db_session_service import TinyDBSessionService
 from src.domain.models.session import SessionState
 
-step_map: dict[
+SESSION_STATE_STRATEGY_MAP: dict[
     SessionState,
     type[InterviewManagerStrategyInterface],
 ] = {
@@ -51,7 +51,7 @@ class StrategyFactory:
     def create_strategy(
         self, session_id: str, session_state: SessionState
     ) -> InterviewManagerStrategyInterface:
-        target_state = step_map[session_state]
+        target_state = SESSION_STATE_STRATEGY_MAP[session_state]
         session = self.session_service.get_session(session_id=session_id)
         return target_state(
             session=session,
