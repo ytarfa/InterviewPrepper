@@ -1,51 +1,56 @@
 from typing import Optional, Annotated
 
-from fastapi import APIRouter
-from fastapi.params import Depends
+from dependency_injector.wiring import inject, Provide
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from ..core.interview.interview_manager import InterviewManager
-from ..core.interview.interview_message_context import InterviewMessageContext
-from ..core.session.session_service import SessionService
-from ..core.session.tiny_db_session_service import TinyDBSessionService
-from ..domain.models.message import Message
+from src.containers import Container
+from src.core.interview.interview_manager import InterviewManager
+from src.core.interview.interview_message_context import InterviewMessageContext
+from src.core.session.session_service import SessionService
+from src.domain.models.message import Message
 
 sessions_router = APIRouter(prefix="/api/sessions")
 
 
 @sessions_router.get("/")
+@inject
 async def get_all_sessions(
-    session_service: Annotated[SessionService, Depends(TinyDBSessionService)]
+    session_service: SessionService = Depends(Provide[Container.session_service]),
 ):
     return session_service.get_all_sessions()
 
 
 @sessions_router.post("/")
+@inject
 async def create_session(
-    session_service: Annotated[SessionService, Depends(TinyDBSessionService)]
+    session_service: SessionService = Depends(Provide[Container.session_service]),
 ):
     return session_service.create_session()
 
 
 @sessions_router.delete("/")
+@inject
 async def delete_all_sessions(
-    session_service: Annotated[SessionService, Depends(TinyDBSessionService)]
+    session_service: SessionService = Depends(Provide[Container.session_service]),
 ):
     return session_service.delete_all_sessions()
 
 
 @sessions_router.get("/{session_id}")
+@inject
 def get_session(
     session_id: str,
-    session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
+    session_service: SessionService = Depends(Provide[Container.session_service]),
 ):
     return session_service.get_session(session_id)
 
 
 @sessions_router.delete("/{session_id}")
+@inject
 async def delete_session(
     session_id: str,
-    session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
+    session_service: SessionService = Depends(Provide[Container.session_service]),
 ):
     return session_service.delete_session(session_id)
 
@@ -56,13 +61,14 @@ class HandleMessageData(BaseModel):
 
 
 @sessions_router.post("/message")
+@inject
 async def handle_message(
     data: HandleMessageData,
-    interview_manager: Annotated[InterviewManager, Depends(InterviewManager)],
-    interview_message_context: Annotated[
-        InterviewMessageContext, Depends(InterviewMessageContext)
-    ],
-    session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
+    interview_manager: InterviewManager = Depends(Provide[Container.interview_manager]),
+    interview_message_context: InterviewMessageContext = Depends(
+        Provide[Container.interview_message_context]
+    ),
+    session_service: SessionService = Depends(Provide[Container.session_service]),
 ) -> list[Message]:
     await interview_manager.initialize(data.session_id)
     await interview_manager.handle_message(data.message)

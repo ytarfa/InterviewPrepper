@@ -1,7 +1,6 @@
 from typing import Optional, Tuple
 
 from langchain.output_parsers import EnumOutputParser
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from src.core.interview.command.command_base import (

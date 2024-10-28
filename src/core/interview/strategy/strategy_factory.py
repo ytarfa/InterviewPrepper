@@ -1,6 +1,4 @@
-from typing import Annotated, Union
-
-from fastapi.params import Depends
+from typing import Annotated
 
 from src.core.interview.strategy.answer_evaluation_strategy import (
     AnswerEvaluationStrategy,
@@ -22,7 +20,6 @@ from src.core.interview.strategy.strategy_base import (
 )
 from src.core.interview.interview_message_context import InterviewMessageContext
 from src.core.session.session_service import SessionService
-from src.core.session.tiny_db_session_service import TinyDBSessionService
 from src.domain.models.session import SessionState
 
 SESSION_STATE_STRATEGY_MAP: dict[
@@ -40,10 +37,8 @@ SESSION_STATE_STRATEGY_MAP: dict[
 class StrategyFactory:
     def __init__(
         self,
-        session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
-        interview_message_context: Annotated[
-            InterviewMessageContext, Depends(InterviewMessageContext)
-        ],
+        session_service: SessionService,
+        interview_message_context: InterviewMessageContext,
     ):
         self.session_service = session_service
         self.interview_message_context = interview_message_context

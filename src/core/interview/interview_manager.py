@@ -1,21 +1,19 @@
-from typing import Annotated, Optional
+from typing import Optional
 
-from fastapi.params import Depends
 
 from src.core.interview.strategy.strategy_base import (
     InterviewManagerStrategyInterface,
 )
 from .strategy.strategy_factory import StrategyFactory
 from ..session.session_service import SessionService
-from ..session.tiny_db_session_service import TinyDBSessionService
 from ...domain.models.message import Message, MessageType
 
 
 class InterviewManager:
     def __init__(
         self,
-        session_service: Annotated[SessionService, Depends(TinyDBSessionService)],
-        strategy_factory: Annotated[StrategyFactory, Depends(StrategyFactory)],
+        session_service: SessionService,
+        strategy_factory: StrategyFactory,
     ):
         self.session_service = session_service
         self.strategy_factory = strategy_factory
