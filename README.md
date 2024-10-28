@@ -1,44 +1,161 @@
-# Interview Practice Assistant API (v0.1.0)
+# Interview Practice Assistant API
 
-A FastAPI-based backend service that uses LangChain and Claude to create an interactive interview practice experience. This initial version provides basic functionality for conducting mock interviews with AI-generated questions and feedback.
+A backend service built with FastAPI and LangChain.
 
-## Overview
+The Interview Practice Assistant API aims to help users strengthen their interview skills by:
+- Generating tailored interview questions that align with the user’s resume and target job description
+- Offering constructive, actionable feedback on responses, allowing users to learn and refine their answers in real time
 
-The Interview Practice Assistant helps users prepare for job interviews by:
 
-- Generating relevant technical and behavioral questions based on the user's resume and target job description
-- Providing constructive feedback on answers
-- Offering follow-up questions to dive deeper into topics
-- Maintaining context throughout the interview session
+## Running the Application
+
+### Prerequisites
+- Python 3.8 or higher
+- pip
+
+### Installation Steps
+
+1. Clone the repository
+```bash
+git clone [repository-url]
+cd [repository-name]
+```
+
+2. Create and activate a virtual environment (recommended)
+
+```
+# Windows
+python -m venv venv
+venv\Scripts\activate
+```
+
+```
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies
+
+```pip install -r requirements.txt```
+
+### Running the Application
+
+4. Start the FastAPI server
+
+```
+uvicorn main:app --reload
+```
+The application will be available at http://127.0.0.1:8000
+
+### API Documentation
+
+FastAPI automatically generates interactive API documentation:
+
+Swagger UI: http://127.0.0.1:8000/docs
+
+ReDoc: http://127.0.0.1:8000/redoc
+
+## Features Status
+
+### Core Functionality
+- [x] Resume Analysis
+  - [x] Extract information from resume
+  - [ ] Allow users to edit extracted resume information
+  - [ ] Support resume-only interview preparation
+
+- [x] Job Description Analysis
+  - [x] Extract information from job description
+  - [ ] Allow users to edit extracted job description
+  - [ ] Support job description-only interview preparation
+
+### Interview Process
+- [x] Question Generation & Evaluation
+  - [x] Generate relevant interview questions
+  - [x] Evaluate user responses
+  - [ ] Support answer retry after feedback
+  - [ ] Enable follow-up questions to previous responses
+
+### Customization Options
+- [ ] Question Types
+  - [ ] Separate behavioral and technical questions
+  - [ ] Let users choose question type
+  - [ ] Track skills/experiences covered in questions
+
+- [ ] Interview Flow Control
+  - [ ] Allow users to select topics for upcoming questions
+  - [ ] Provide progress tracking for covered skills
 
 ## API Endpoints
 
-### Start Interview
-
+### Get All Sessions
 ```http
-POST /api/interview/start
+GET /api/sessions/
+```
+Retrieves all interview preparation sessions.
+
+**Response**: List of sessions (200 OK)
+
+### Create New Session
+```http
+POST /api/sessions/
+```
+Creates a new interview preparation session.
+
+**Response**: Session details (200 OK)
+
+### Delete All Sessions
+```http
+DELETE /api/sessions/
+```
+Removes all interview preparation sessions from the system.
+
+**Response**: Confirmation of deletion (200 OK)
+
+### Get Specific Session
+```http
+GET /api/sessions/{session_id}
+```
+Retrieves details for a specific interview session.
+
+**Parameters**:
+- `session_id` (path parameter, required): Unique identifier for the session
+
+**Response**: Session details (200 OK)
+
+### Delete Specific Session
+```http
+DELETE /api/sessions/{session_id}
+```
+Removes a specific interview session.
+
+**Parameters**:
+- `session_id` (path parameter, required): Unique identifier for the session
+
+**Response**: Confirmation of deletion (200 OK)
+
+### Handle Message
+```http
+POST /api/sessions/message
+```
+Processes messages within an interview session. Handling the interview Q&A interaction.
+
+**Request Body**:
+```json
+{
+  "session_id": "string",
+  "message": "string"
+}
 ```
 
-Initiates a new interview session with the provided resume and job description.
-
-### Submit Answer
-
-```http
-POST /api/interview/answer
+**Response**: Array of messages
+```json
+[
+  {
+    "content": "string",
+    "type": "user" | "system"
+  }
+]
 ```
 
-Submits an answer for evaluation and optionally requests a follow-up question.
 
-## Feature Checklist
-
-Features:
-
-- [x] Question generation based on resume and job description
-- [x] Answer evaluation with constructive feedback
-- [x] Follow-up question generation
-- [ ] Extract skills from job description and YoE from job description and resume
-- [ ] Interview history tracking
-- [ ] Progress tracking and analytics
-- [ ] Custom prompt templates
-- [ ] Question banks
-- [ ] Multiple interview formats (behavioral, technical, etc.)
