@@ -73,5 +73,6 @@ async def handle_message(
     await interview_manager.initialize(data.session_id)
     await interview_manager.handle_message(data.message)
     messages = interview_message_context.get_messages()
+    interview_message_context.clear_messages()
     session_service.add_messages(session_id=data.session_id, messages=messages)
     return messages

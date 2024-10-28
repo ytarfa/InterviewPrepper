@@ -10,3 +10,6 @@ class InterviewMessageContext:
 
     def get_messages(self):
         return self.messages
+
+    def clear_messages(self):
+        self.messages = []

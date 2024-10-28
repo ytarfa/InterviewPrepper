@@ -1,5 +1,6 @@
 from typing import Optional
 
+from dependency_injector.providers import Callable
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 
@@ -21,19 +22,25 @@ from src.core.interview.strategy.strategy_base import (
 from src.core.prompts.interview.generate_interview_question import (
     generate_interview_question_prompt,
 )
+from src.core.session.session_service import SessionService
 from src.domain.models.interview_question import InterviewQuestion
 from src.domain.models.message import Message, MessageType, InterviewQuestionMessage
-from src.domain.models.session import SessionState
+from src.domain.models.session import SessionState, Session
 from src.infrastructure.llm import claude_sonnet
 
 
 class InterviewQuestionStrategy(InterviewManagerStrategyInterface):
-    def __init__(self, session, session_service, interview_message_context):
-        super().__init__(
-            session=session,
-            session_service=session_service,
-            interview_message_context=interview_message_context,
-        )
+    def __init__(
+        self,
+        session_id: str,
+        session_service: SessionService,
+        command_providers: dict[
+            type[InterviewCommand], Callable[..., InterviewCommand]
+        ],
+    ):
+        self.session_id = session_id
+        self.session_service = session_service
+        self.command_providers = command_providers
 
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         parser = PydanticOutputParser(pydantic_object=InterviewQuestion)
@@ -50,10 +57,11 @@ class InterviewQuestionStrategy(InterviewManagerStrategyInterface):
             | parser
         )
 
+        session = self.session_service.get_session(self.session_id)
         interview_question: InterviewQuestion = chain.invoke(
             {
-                "resume": self.session.resume_info,
-                "job_description": self.session.job_description_info,
+                "resume": session.resume_info,
+                "job_description": session.job_description_info,
             }
         )
         interview_question_message = InterviewQuestionMessage(
@@ -63,18 +71,13 @@ class InterviewQuestionStrategy(InterviewManagerStrategyInterface):
         )
 
         return [
-            UpdateSessionContextInterviewQuestionCommand(
-                session_id=self.session.session_id,
-                session_service=self.session_service,
-                interview_question=interview_question,
+            self.command_providers.get(
+                type[UpdateSessionContextInterviewQuestionCommand]
+            )(session_id=self.session_id, interview_question=interview_question),
+            self.command_providers.get(type[RespondWithMessagesCommand])(
+                message=interview_question_message
             ),
-            RespondWithMessagesCommand(
-                message=interview_question_message,
-                interview_message_context=self.interview_message_context,
-            ),
-            UpdateSessionStateCommand(
-                session_id=self.session.session_id,
-                session_service=self.session_service,
-                target_state=SessionState.EVALUATION,
+            self.command_providers.get(type[UpdateSessionStateCommand])(
+                session_id=self.session_id, target_state=SessionState.EVALUATION
             ),
         ]

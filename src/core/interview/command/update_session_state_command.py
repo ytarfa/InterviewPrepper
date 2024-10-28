@@ -13,8 +13,8 @@ class UpdateSessionStateCommand(InterviewCommand):
         target_state: SessionState,
     ):
         self.session_id = session_id
-        self.session_service = session_service
         self.target_state = target_state
+        self.session_service = session_service
 
     def execute(self):
         self.session_service.update_state(self.session_id, self.target_state)

@@ -1,5 +1,6 @@
 from typing import Optional, Tuple
 
+from dependency_injector.providers import Callable
 from langchain.output_parsers import EnumOutputParser
 from langchain_core.prompts import PromptTemplate
 
@@ -23,7 +24,7 @@ from src.core.prompts.interview.intent_classifiers import (
     StartMessageIntentClassifierPromptOutput,
 )
 from src.domain.models.message import Message, MessageType
-from src.domain.models.session import SessionState
+from src.domain.models.session import SessionState, Session
 from src.infrastructure.llm import claude_haiku
 
 RETRY_MESSAGE = Message(content=start_retry_message, type=MessageType.SYSTEM)
@@ -44,12 +45,15 @@ TARGET_STATE_MAP: dict[
 
 
 class StartStrategy(InterviewManagerStrategyInterface):
-    def __init__(self, session, session_service, interview_message_context):
-        super().__init__(
-            session=session,
-            session_service=session_service,
-            interview_message_context=interview_message_context,
-        )
+    def __init__(
+        self,
+        session_id: str,
+        command_providers: dict[
+            type[InterviewCommand], Callable[..., InterviewCommand]
+        ],
+    ):
+        self.session_id = session_id
+        self.command_providers = command_providers
 
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         parser = EnumOutputParser(enum=StartMessageIntentClassifierPromptOutput)
@@ -72,21 +76,17 @@ class StartStrategy(InterviewManagerStrategyInterface):
         # If intent could not be classified, ask the user for intent again
         if target_state is None:
             return [
-                RespondWithMessagesCommand(
-                    message=RETRY_MESSAGE,
-                    interview_message_context=self.interview_message_context,
+                self.command_providers.get(type[RespondWithMessagesCommand])(
+                    message=RETRY_MESSAGE
                 )
             ]
 
         response_message = Message(content=message_content, type=MessageType.SYSTEM)
         return [
-            RespondWithMessagesCommand(
-                message=response_message,
-                interview_message_context=self.interview_message_context,
+            self.command_providers.get(type[RespondWithMessagesCommand])(
+                message=response_message
             ),
-            UpdateSessionStateCommand(
-                session_id=self.session.session_id,
-                session_service=self.session_service,
-                target_state=target_state,
+            self.command_providers.get(type[UpdateSessionStateCommand])(
+                session_id=self.session_id, target_state=target_state
             ),
         ]

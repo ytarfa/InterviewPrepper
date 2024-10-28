@@ -1,5 +1,6 @@
 from typing import Optional
 
+from dependency_injector.providers import Callable
 from langchain.output_parsers import OutputFixingParser
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
@@ -10,6 +11,7 @@ from src.core.interview.command.respond_with_messages_command import (
 )
 from src.core.interview.strategy.strategy_base import InterviewManagerStrategyInterface
 from src.core.prompts.interview.evaluate_answer import evaluate_answer_prompt
+from src.core.session.session_service import SessionService
 from src.domain.models.answer_evaluation import AnswerEvaluation
 from src.domain.models.message import (
     MessageType,
@@ -19,12 +21,17 @@ from src.infrastructure.llm import claude_sonnet
 
 
 class AnswerEvaluationStrategy(InterviewManagerStrategyInterface):
-    def __init__(self, session, session_service, interview_message_context):
-        super().__init__(
-            session=session,
-            session_service=session_service,
-            interview_message_context=interview_message_context,
-        )
+    def __init__(
+        self,
+        session_id: str,
+        session_service: SessionService,
+        command_providers: dict[
+            type[InterviewCommand], Callable[..., InterviewCommand]
+        ],
+    ):
+        self.session_id = session_id
+        self.session_service = session_service
+        self.command_providers = command_providers
 
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         parser = PydanticOutputParser(pydantic_object=AnswerEvaluation)
@@ -46,8 +53,8 @@ class AnswerEvaluationStrategy(InterviewManagerStrategyInterface):
             | claude_sonnet()
             | fixing_parser
         )
-
-        interview_question = self.session.context.current_interview_question
+        session = self.session_service.get_session(session_id=self.session_id)
+        interview_question = session.context.current_interview_question
         evaluation = chain.invoke(
             {
                 "interview_question": interview_question.question,
@@ -63,8 +70,7 @@ class AnswerEvaluationStrategy(InterviewManagerStrategyInterface):
         )
 
         return [
-            RespondWithMessagesCommand(
-                message=evaluation_message,
-                interview_message_context=self.interview_message_context,
+            self.command_providers.get(type[RespondWithMessagesCommand])(
+                message=evaluation_message
             )
         ]
