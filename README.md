@@ -10,7 +10,7 @@ The Interview Practice Assistant API aims to help users strengthen their intervi
 ## Running the Application
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.9 or higher
 - pip
 
 ### Installation Steps
