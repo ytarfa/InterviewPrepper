@@ -35,13 +35,19 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-3. Install dependencies
+3. Create a .env file in the project root and add your Anthropic API key:
+
+```
+ANTHROPIC_API_KEY=your_api_key_here
+```
+
+4. Install dependencies
 
 ```pip install -r requirements.txt```
 
 ### Running the Application
 
-4. Start the FastAPI server
+5. Start the FastAPI server
 
 ```
 uvicorn main:app --reload
@@ -85,6 +91,12 @@ ReDoc: http://127.0.0.1:8000/redoc
 - [ ] Interview Flow Control
   - [ ] Allow users to select topics for upcoming questions
   - [ ] Provide progress tracking for covered skills
+
+### Skill Research Integration
+- [ ] Leverage LangChain tools to research user skills
+  - [ ] Automatically retrieve information about user's skills
+  - [ ] Identify common interview questions for each skill
+  - [ ] Incorporate research results into question generation
 
 ## API Endpoints
 
