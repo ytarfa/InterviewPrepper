@@ -9,6 +9,9 @@ from src.core.interview.command.command_base import InterviewCommand
 from src.core.interview.command.respond_with_messages_command import (
     RespondWithMessagesCommand,
 )
+from src.core.interview.strategy.interview_question_strategy import (
+    InterviewQuestionStrategy,
+)
 from src.core.interview.strategy.strategy_base import InterviewManagerStrategyInterface
 from src.core.prompts.interview.evaluate_answer import evaluate_answer_prompt
 from src.core.session.session_service import SessionService
@@ -28,10 +31,12 @@ class AnswerEvaluationStrategy(InterviewManagerStrategyInterface):
         command_providers: dict[
             type[InterviewCommand], Callable[..., InterviewCommand]
         ],
+        interview_question_strategy_provider: Callable[..., InterviewQuestionStrategy],
     ):
         self.session_id = session_id
         self.session_service = session_service
         self.command_providers = command_providers
+        self.interview_question_strategy_provider = interview_question_strategy_provider
 
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         parser = PydanticOutputParser(pydantic_object=AnswerEvaluation)
@@ -69,8 +74,16 @@ class AnswerEvaluationStrategy(InterviewManagerStrategyInterface):
             evaluation=evaluation,
         )
 
+        # Follow question evaluation with another question
+        # TO-DO: Ask user if they want a follow-up / a new question / a retry
+        interview_strategy: InterviewQuestionStrategy = (
+            self.interview_question_strategy_provider(session_id=self.session_id)
+        )
+        interview_commands = await interview_strategy.handle_message()
+
         return [
             self.command_providers.get(type[RespondWithMessagesCommand])(
                 message=evaluation_message
-            )
+            ),
+            *interview_commands,
         ]

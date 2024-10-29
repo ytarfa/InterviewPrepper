@@ -95,6 +95,7 @@ class Container(containers.DeclarativeContainer):
         AnswerEvaluationStrategy,
         command_providers=command_providers,
         session_service=session_service,
+        interview_question_strategy_provider=interview_question_strategy.provider,
     )
     resume_strategy = StrategyProvider(
         ResumeStrategy,
