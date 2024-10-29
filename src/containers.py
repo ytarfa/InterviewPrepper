@@ -86,16 +86,6 @@ class Container(containers.DeclarativeContainer):
     start_strategy = StrategyProvider(
         StartStrategy, command_providers=command_providers
     )
-    resume_strategy = StrategyProvider(
-        ResumeStrategy,
-        command_providers=command_providers,
-        session_service=session_service,
-    )
-    job_description_strategy = StrategyProvider(
-        JobDescriptionStrategy,
-        command_providers=command_providers,
-        session_service=session_service,
-    )
     interview_question_strategy = StrategyProvider(
         InterviewQuestionStrategy,
         command_providers=command_providers,
@@ -105,6 +95,18 @@ class Container(containers.DeclarativeContainer):
         AnswerEvaluationStrategy,
         command_providers=command_providers,
         session_service=session_service,
+    )
+    resume_strategy = StrategyProvider(
+        ResumeStrategy,
+        command_providers=command_providers,
+        session_service=session_service,
+        interview_question_strategy_provider=interview_question_strategy.provider,
+    )
+    job_description_strategy = StrategyProvider(
+        JobDescriptionStrategy,
+        command_providers=command_providers,
+        session_service=session_service,
+        interview_question_strategy_provider=interview_question_strategy.provider,
     )
 
     strategy_providers = providers.Dict(

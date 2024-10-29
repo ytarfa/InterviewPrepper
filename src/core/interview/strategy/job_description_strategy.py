@@ -16,6 +16,9 @@ from src.core.interview.command.update_session_job_description_command import (
 from src.core.interview.command.update_session_state_command import (
     UpdateSessionStateCommand,
 )
+from src.core.interview.strategy.interview_question_strategy import (
+    InterviewQuestionStrategy,
+)
 from src.core.interview.strategy.strategy_base import (
     InterviewManagerStrategyInterface,
 )
@@ -38,10 +41,12 @@ class JobDescriptionStrategy(InterviewManagerStrategyInterface):
         command_providers: dict[
             type[InterviewCommand], Callable[..., InterviewCommand]
         ],
+        interview_question_strategy_provider: Callable[..., InterviewQuestionStrategy],
     ):
         self.session_id = session_id
         self.command_providers = command_providers
         self.session_service = session_service
+        self.interview_question_strategy_provider = interview_question_strategy_provider
 
     async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
         parser = PydanticOutputParser(pydantic_object=JobDescriptionInfo)
@@ -65,29 +70,7 @@ class JobDescriptionStrategy(InterviewManagerStrategyInterface):
             content=job_description_info.model_dump_json(), type=MessageType.SYSTEM
         )
 
-        # If resume_info is None, ask for resume, else go to interview questions
-        go_to_resume_commands = [
-            self.command_providers.get(type[UpdateSessionStateCommand])(
-                session_id=self.session_id, target_state=SessionState.RESUME
-            ),
-            self.command_providers.get(type[RespondWithMessagesCommand])(
-                message=Message(content=ask_for_resume_message, type=MessageType.SYSTEM)
-            ),
-        ]
-        go_to_interview_commands = [
-            self.command_providers.get(type[UpdateSessionStateCommand])(
-                session_id=self.session_id, target_state=SessionState.INTERVIEW
-            )
-            # To-do call interview strategy instantly
-        ]
-        session = self.session_service.get_session(self.session_id)
-        next_step_commands = (
-            go_to_resume_commands
-            if session.resume_info is None
-            else go_to_interview_commands
-        )
-
-        return [
+        commands = [
             self.command_providers.get(type[UpdateSessionJobDescriptionInfoCommand])(
                 session_id=self.session_id, job_description_info=job_description_info
             ),
@@ -100,5 +83,31 @@ class JobDescriptionStrategy(InterviewManagerStrategyInterface):
             self.command_providers.get(type[RespondWithMessagesCommand])(
                 message=job_description_info_message
             ),
-            *next_step_commands,
         ]
+
+        session = self.session_service.get_session(self.session_id)
+        if session.resume_info is None:
+            # If session.resume_info is None ask for resume
+            commands.extend(
+                [
+                    self.command_providers.get(type[UpdateSessionStateCommand])(
+                        session_id=self.session_id,
+                        target_state=SessionState.RESUME,
+                    ),
+                    self.command_providers.get(type[RespondWithMessagesCommand])(
+                        message=Message(
+                            content=ask_for_resume_message,
+                            type=MessageType.SYSTEM,
+                        )
+                    ),
+                ]
+            )
+        else:
+            # Else go to interview
+            interview_strategy: InterviewQuestionStrategy = (
+                self.interview_question_strategy_provider(session_id=self.session_id)
+            )
+            interview_commands = await interview_strategy.handle_message()
+            commands.extend(interview_commands)
+
+        return commands

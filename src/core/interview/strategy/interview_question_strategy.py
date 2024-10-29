@@ -42,7 +42,9 @@ class InterviewQuestionStrategy(InterviewManagerStrategyInterface):
         self.session_service = session_service
         self.command_providers = command_providers
 
-    async def handle_message(self, message: Optional[str]) -> list[InterviewCommand]:
+    async def handle_message(
+        self, message: Optional[str] = None
+    ) -> list[InterviewCommand]:
         parser = PydanticOutputParser(pydantic_object=InterviewQuestion)
         format_instructions = parser.get_format_instructions()
         chain = (
